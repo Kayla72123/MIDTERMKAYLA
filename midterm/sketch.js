@@ -11,6 +11,11 @@ var girlSpeed = 2;
 var isGirlStopped = false;
 var girlWalksOff = false;
 
+//bkg color
+var bkgColor = [255, 0, 150]; 
+var newColor = [100, 100, 255]; 
+var fadeSpeed = 50;
+
 function setup() {
   // Centering the canvas -> code from p5.js reference
   var centered = createCanvas(800, 800);
@@ -25,11 +30,12 @@ function setup() {
 
 function draw() {
   // Scene change counter
-  if (millis() - timer > 5000) { // After 5 seconds
+  if (millis() - timer > 10000) { // After 5 seconds
     currentScene++;
     timer = millis(); // Reset timer
     if (currentScene > 2) {  // Loop back to the first scene
       currentScene = 1;
+      resetScene();
     }
   }
 
@@ -42,8 +48,19 @@ function draw() {
   }
 }
 
+function resetScene() {
+  // Reset girl circle position and state
+  girlX = 0;           // Start position off-screen
+  isGirlStopped = false; // Reset stop state
+  girlWalksOff = false;  // Reset walk-off state
+  bkgColor = [255, 0, 150];
+}
+
+
 function scene1() { 
-  background(255, 0, 150);
+
+  background(bkgColor);
+
   ellipseMode(CENTER);
   rectMode(CORNER); 
 
@@ -66,7 +83,7 @@ function scene1() {
   fill(255, 0, 255);
   ellipse(girlX, 600, 200, 200);
 
-  // After the girl stops, wait 2 seconds, then she starts walking off the screen
+  // wait to start walking off the screen
   if (isGirlStopped && millis() - timer > 2000) {
     girlWalksOff = true;
   }
@@ -75,12 +92,28 @@ function scene1() {
   if (girlWalksOff) {
     girlX += girlSpeed;
   }
+
+  if (girlX == 900){
+    currentScene = 2;
+    timer = millis();
+  }
 }
 
 function scene2() {
-  background(100, 100, 255);  // Blue background (different from scene 1)
 
-  // Sad circle stays in place
+  for (var i = 0; i < 3; i++) { 
+    bkgColor[i] += (newColor[i] - bkgColor[i]) / fadeSpeed;
+  }
+
+  // Apply the background color
+  background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
+  // Grass
+  fill(0, 255, 0); 
+  rect(0, 700, 850, 200);
+
+
+  // Sad circle stays 
   fill(0, 0, 255);
   ellipse(x, 600, 200, 200);
 
