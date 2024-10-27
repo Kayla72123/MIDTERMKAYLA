@@ -11,10 +11,12 @@ var girlSpeed = 2;
 var isGirlStopped = false;
 var girlWalksOff = false;
 
-//bkg color
+//bkg colors
 var bkgColor = [255, 0, 150]; 
-var newColor = [100, 100, 255]; 
+var redColor = [173, 19, 19]; 
+var blueColor = [100, 100, 255]; 
 var fadeSpeed = 50;
+var isFadingToBlue = false;
 
 function setup() {
   // Centering the canvas -> code from p5.js reference
@@ -53,7 +55,9 @@ function resetScene() {
   girlX = 0;           // Start position off-screen
   isGirlStopped = false; // Reset stop state
   girlWalksOff = false;  // Reset walk-off state
+  isFadingToBlue = false;
   bkgColor = [255, 0, 150];
+  
 }
 
 
@@ -73,10 +77,15 @@ function scene1() {
   ellipse(x, 600, 200, 200);
 
   // Check girl's location and move her towards the sad circle
-  if (girlX < 600 && !isGirlStopped) {
+  if (girlX < 200 && isGirlStopped==false) {
     girlX += girlSpeed;
-  } else {
+  } 
+  if (girlX ==200) {
     isGirlStopped = true;
+    
+    // if (girlX == -400){
+    //   girlX = -400;
+    // }
   }
 
   // Girl circle
@@ -84,29 +93,45 @@ function scene1() {
   ellipse(girlX, 600, 200, 200);
 
   // wait to start walking off the screen
-  if (isGirlStopped && millis() - timer > 2000) {
+  if (isGirlStopped && (millis() - timer > 5000)) {
     girlWalksOff = true;
+    bkgColor = redColor;
+
   }
 
   // Girl walks off the screen
-  if (girlWalksOff) {
-    girlX += girlSpeed;
+  if (girlWalksOff == true) {
+    
+
+    girlX -= girlSpeed;
   }
 
-  if (girlX == 900){
+  if (girlX == -200){
+    isFadingToBlue = true;
     currentScene = 2;
     timer = millis();
   }
 }
 
 function scene2() {
+  // bkgColor =[];
+  // bkgColor = [173, 19, 19]; 
+  // for (var i = 0; i < 3; i++) { 
+  //   bkgColor[i] += (newColor[i] - bkgColor[i]) / fadeSpeed;
+  // }
 
-  for (var i = 0; i < 3; i++) { 
-    bkgColor[i] += (newColor[i] - bkgColor[i]) / fadeSpeed;
+  if (isFadingToBlue) {
+    for (var i = 0; i < 3; i++) { 
+      bkgColor[i] += (blueColor[i] - bkgColor[i]) / fadeSpeed; // Fade background
+    }
   }
 
   // Apply the background color
   background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
+
+  // // Apply the background color
+  // background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
   // Grass
   fill(0, 255, 0); 
@@ -117,10 +142,10 @@ function scene2() {
   fill(0, 0, 255);
   ellipse(x, 600, 200, 200);
 
-  // Girl continues walking off the screen
-  fill(255, 0, 255);
-  if (girlX < width + 200) {  // Check if the girl is off the screen
-    girlX += girlSpeed;
-  }
-  ellipse(girlX, 600, 200, 200);
+  // // Girl continues walking off the screen
+  // fill(255, 0, 255);
+  // if (girlX < width + 200) {  // Check if the girl is off the screen
+  //   girlX += girlSpeed;
+  // }
+  // ellipse(girlX, 600, 200, 200);
 }
