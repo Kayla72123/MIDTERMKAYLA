@@ -18,6 +18,9 @@ var blueColor = [100, 100, 255];
 var fadeSpeed = 50;
 var isFadingToBlue = false;
 
+// Rain 
+var particles = [];
+
 function setup() {
   // Centering the canvas -> code from p5.js reference
   var centered = createCanvas(800, 800);
@@ -28,6 +31,11 @@ function setup() {
 
   // Scene changes based on time
   timer = millis();
+
+  //start to rain in scene 3
+  for (var i = 0; i < 100; i++) {
+    particles.push(new Particle(random(width), random(-500, 0), 0, random(2, 5))); // Random positions and speed
+  }
 }
 
 function draw() {
@@ -48,6 +56,13 @@ function draw() {
   else if (currentScene === 2) {
     scene2();
   }
+  else if (currentScene === 2) {
+    scene3();
+  }
+  else if (currentScene === 2) {
+    scene2=4();
+    scene4();s
+  }
 }
 
 function resetScene() {
@@ -57,7 +72,7 @@ function resetScene() {
   girlWalksOff = false;  // Reset walk-off state
   isFadingToBlue = false;
   bkgColor = [255, 0, 150];
-  
+
 }
 
 
@@ -148,4 +163,56 @@ function scene2() {
   //   girlX += girlSpeed;
   // }
   // ellipse(girlX, 600, 200, 200);
+    if (isGirlStopped && (millis() - timer > 2000)) {
+    currentScene = 3;
+
+  }
+}
+
+function scene3() {
+  background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
+  // Grass
+  fill(0, 255, 0); 
+  rect(0, 700, 850, 200);
+
+  // Sad circle stays in place
+  fill(0, 0, 255);
+  ellipse(x, 600, 200, 200);
+
+  // Rain effect
+  for (var i = 0; i < particles.length; i++) {
+    particles[i].update();
+    particles[i].display();
+    particles[i].checkEdges();
+  }
+}
+
+// Particle class for the rain
+class Particle {
+
+  constructor(x, y, a1, a2){
+    this.position = new createVector(x, y);
+    this.velocity = new createVector(0,0);
+    this.acceleration = new createVector(a1, a2);
+    this.topspeed = 10;
+  }
+
+  update(){
+    this.velocity.add(this.acceleration);
+    this.position.add(this.velocity);
+  }
+
+  display(){
+    stroke(255);
+    fill(255);
+    ellipse(this.position.x, this.position.y, 5, 15); // Make the particle long like a raindrop
+  }
+
+  checkEdges(){
+    if(this.position.y > height){
+      this.position.y = random(-100, 0); // Reset raindrop to top of the screen
+      this.position.x = random(width);   // Randomize x position
+    }
+  }
 }
