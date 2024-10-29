@@ -1,7 +1,7 @@
 //scene tracker
 let currentScene = 1;
 let timer = 0;
-let nightToDay;
+let nightToDay=0;
 
 // sad circle 
 let x = 400;
@@ -214,8 +214,8 @@ function scene2() {
 function scene3() {
   background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
-  if ((isGirlStopped == true) && (millis() - timer > 3000)) {
-    timer = millis();
+  if ((isGirlStopped == true) ) {//took out && (millis() - timer > 3000)
+    //timer = millis();
     isNightFading = true;
   }
 
@@ -229,7 +229,10 @@ function scene3() {
     fill(194, 200, 209);
     ellipse(moonX,moonY,100,100);
     moonX +=5;
-    //moonY += 1;
+
+    //trying to debug why the sun isn't reaching the end of the width
+    print("MoonX: " + moonX);
+    print("Night Fading: " + isNightFading);
 
     if (moonX > (width+100)) {
       isNightFading = false;
@@ -244,7 +247,7 @@ function scene3() {
     for (let i = 0; i < 3; i++) { 
       bkgColor[i] += (dayColor[i] - bkgColor[i]) / fadeSpeed;
     }
-    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+    //background(bkgColor[0], bkgColor[1], bkgColor[2]);
     //sun rising&setting
     noStroke();
     fill(255, 223, 97);
@@ -252,16 +255,40 @@ function scene3() {
     sunX += 5;
     //sunY += 1;
 
-    if(sunX > (width+100)){
+    print("SunX: " + sunX);
+    print("Day Fading: " + isDayFading);
+
+    // if (sunX == 730) {
+    //   print("SunX stuck at 730. Forcing movement...");
+    //   sunX += 50;  // Force sun to jump forward
+    // }
+
+    // if (sunX >= 700 && sunX <= 800) {
+    //   sunX += 7;  // Speed boost near the edge
+    // } else {
+    //   sunX += 5;  // Normal speed
+    // }
+
+    if(sunX > (width+400)){//changed
       //rest to night 
       isDayFading = false;
+      print("SunX after: " + sunX);
+
+      //isNightFading = true;
       resetSun();
       resetSky();
       nightToDay += 1; 
-      if (nightToDay < 2) {
-         isNightFading = true; // Go back to night
-      }
+       if (nightToDay < 2) {
+          isNightFading = true; // Go back to night
+       }
     }
+
+    // if (sunX == 700) {
+    //   print("SunX Stuck at 705, forcing sun movement...");
+    //   sunX += 30;  // Force sun to jump ahead
+    // }
+
+
   }
 
   // Grass
