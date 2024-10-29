@@ -125,10 +125,8 @@ function resetScene() {
   currentScene = 1;
 
   //moon&sun
-  moonX = 600;
-  moonY = 0;
+  moonX = -100;
   sunX = -100;
-  sunY = 700;
 
   //day to night reset
   nightToDay = 0;  
@@ -216,6 +214,56 @@ function scene2() {
 function scene3() {
   background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
+  if ((isGirlStopped == true) && (millis() - timer > 3000)) {
+    timer = millis();
+    isNightFading = true;
+  }
+
+  if (isNightFading == true && isDayFading == false) {
+    for (let i = 0; i < 3; i++) { 
+      bkgColor[i] += (nightColor[i] - bkgColor[i]) / fadeSpeed;
+    }
+
+    //rsing moon
+    noStroke();
+    fill(194, 200, 209);
+    ellipse(moonX,moonY,100,100);
+    moonX +=5;
+    //moonY += 1;
+
+    if (moonX > (width+100)) {
+      isNightFading = false;
+      isDayFading = true;
+      resetMoon();
+      nightToDay += 1; 
+    }
+  }
+
+  //sky brightens 
+  if (isDayFading == true && isNightFading == false) {
+    for (let i = 0; i < 3; i++) { 
+      bkgColor[i] += (dayColor[i] - bkgColor[i]) / fadeSpeed;
+    }
+    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+    //sun rising&setting
+    noStroke();
+    fill(255, 223, 97);
+    ellipse(sunX, sunY, 100, 100);
+    sunX += 5;
+    //sunY += 1;
+
+    if(sunX > (width+100)){
+      //rest to night 
+      isDayFading = false;
+      resetSun();
+      resetSky();
+      nightToDay += 1; 
+      if (nightToDay < 2) {
+         isNightFading = true; // Go back to night
+      }
+    }
+  }
+
   // Grass
   fill(20, 128, 18); 
   rect(0, 700, 850, 200);
@@ -231,59 +279,6 @@ function scene3() {
     particles[i].checkEdges();
     particles[i].display();
   }
-
-  
-  if ((isGirlStopped == true) && (millis() - timer > 3000)) {
-    timer = millis();
-    isNightFading = true;
-  }
-
-  if (isNightFading == true) {
-    for (let i = 0; i < 3; i++) { 
-      bkgColor[i] += (nightColor[i] - bkgColor[i]) / fadeSpeed;
-    }
-
-    //rsing moon
-    noStroke();
-    fill(194, 200, 209);
-    ellipse(moonX,moonY,100,100);
-    moonX +=1;
-    //moonY += 1;
-
-    if (moonX > (width+100)) {
-      isNightFading = false;
-      isDayFading = true;
-      resetMoon();
-      nightToDay += 1; 
-    }
-}
-
-  //sky brightens 
-  if (isDayFading == true) {
-    for (let i = 0; i < 3; i++) { 
-      bkgColor[i] += (dayColor[i] - bkgColor[i]) / fadeSpeed;
-    }
-    background(bkgColor[0], bkgColor[1], bkgColor[2]);
-    //sun rising&setting
-    noStroke();
-    fill(255, 223, 97);
-    ellipse(sunX, sunY, 100, 100);
-    sunX += 1;
-    //sunY += 1;
-
-    if(sunX > (width+100)){
-      //rest to night 
-      isDayFading = false;
-      resetSun();
-      resetSky();
-      nightToDay += 1; 
-      if (nightToDay < 2) {
-         isNightFading = true; // Go back to night
-      }
-    }
-  }
-
-  
 
 }
 
@@ -323,7 +318,7 @@ function resetSun() {
 
 // Resets the sky to dark blue for the next night
 function resetSky() {
-  bkgColor = [29, 54, 92];  
+  bkgColor = nightColor;  
   isNightFading = true;    
 }
 
