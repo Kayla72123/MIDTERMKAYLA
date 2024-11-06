@@ -1,13 +1,14 @@
 //scene tracker
 let currentScene = 1;
 let timer = 0;
-let nightToDay=0;
 
 // sad circle 
 let x = 400;
+let elWalk = 2;
+let circleStop = 400;
 
 // girl circle
-let girlX = 0;
+let girlX = -100;
 let girlSpeed = 2;
 
 // girl's movement
@@ -17,7 +18,7 @@ let girlWalksOff = false;
 //bkg colors
 let bkgColor = [255, 0, 150]; 
 let redColor = [173, 19, 19]; 
-let blueColor = [100, 100, 255]; 
+let blueColor = [135, 206, 235]; 
 let nightColor = [29, 54, 92];
 let dayColor = [135, 206, 235];
 
@@ -29,14 +30,36 @@ let isDayFading = false;
 
 // Rain 
 let particles = [];
+let rainStopped = false;
 
 //moon
 let moonX = -100;
-let moonY = 200;
+let moonY = 100;
+let nightToDay = 0;
 
 //sun
 let sunX = -100;
-let sunY = 200;
+let sunY = 100;
+
+let sunCount = 1;
+let testCount = 1;
+
+//messing with breakup scene 
+let rectX = 0;
+let rectY = 900;
+
+let xOffset=400;
+
+
+//p5 frequency reference
+let startX = 300
+let startY = 0; 
+let endX = 300; 
+let endY = 700; 
+let frequency = 50.5;
+let amplitude = 5;
+
+
 
 function setup() {
 
@@ -84,6 +107,7 @@ function draw() {
     scene3();
   }
   else if (currentScene === 4) {
+    stopScene3();
     scene4();
   }
   else if (currentScene === 5) {
@@ -119,12 +143,13 @@ function resetScene() {
   
   //color reset
   stroke(0);
-  bkgColor = [255, 0, 150];  
-  let isFadingToBlue = false;
-  let isNightFading = false;
+   
+  isFadingToBlue = false;  // Corrected global variables
+  isNightFading = false;
+  isDayFading = false;
   currentScene = 1;
 
-  //moon&sun
+  //moon & sun
   moonX = -100;
   sunX = -100;
 
@@ -134,19 +159,27 @@ function resetScene() {
 
 
 function scene1() { 
+    if (girlWalksOff==true) {
+    bkgColor = [255,0,0]; // Set background color to red
 
+
+  } else {
+    bkgColor = [255, 102, 199]; // Original background color
+  }
+  //bkgColor = [255, 102, 199]; 
   background(bkgColor);
-
+  stroke(0);
   ellipseMode(CENTER);
   rectMode(CORNER); 
 
   // Grass
-  fill(20, 128, 18); 
+  fill(5, 173, 61); 
   rect(0, 700, 850, 200);
 
   // Static sad circle
-  fill(0, 0, 255);
+  fill(120, 255, 208);
   ellipse(x, 600, 200, 200);
+  
 
   // Check girl's location and move her towards the sad circle
   if (girlX < 200 && isGirlStopped==false) {
@@ -159,23 +192,40 @@ function scene1() {
   }
 
   // Girl circle
-  fill(255, 0, 255);
+  fill(212, 0, 255);
   ellipse(girlX, 600, 200, 200);
 
   // wait to start walking off the screen
-  if (isGirlStopped && (millis() - timer > 5000)) {
+  if (isGirlStopped && (millis() - timer > 4000)) {
+
     girlWalksOff = true;
-    bkgColor = redColor;
+    
 
   }
 
   // Girl walks off the screen
   if (girlWalksOff == true) {
-  girlX -= girlSpeed;
+
+    //shaking circle
+    fill(120, 255, 208);
+    xOffset = random(380,420);
+    ellipse(xOffset, 600, 200, 200);
+
+    //ground shaking
+    rectX = random(-10,50);
+    rectY = random(700,750);
+    fill(34, 87, 43); 
+    rect(rectX, rectY, 850, 200);
+    fill(5, 173, 61);
+    rect(rectX=5, rectY+10, 850, 200);
+
+    //girl leaving
+    girlX -= girlSpeed;
+    
   }
 
   //moves to scene 2 when the girl circle is off the screen
-  if (girlX <= -200){
+  if (girlX <= -200 && (millis() - timer > 10000)){
     isFadingToBlue = true;
     currentScene+=1;
     timer = millis();
@@ -195,12 +245,12 @@ function scene2() {
   background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
   // Grass
-  fill(20, 128, 18); 
+  fill(5, 173, 61); 
   rect(0, 700, 850, 200);
 
 
   // Sad circle stays 
-  fill(0, 0, 255);
+  fill(120, 255, 208);
   ellipse(x, 600, 200, 200);
 
 
@@ -214,90 +264,98 @@ function scene2() {
 function scene3() {
   background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
-  if ((isGirlStopped == true) ) {//took out && (millis() - timer > 3000)
-    //timer = millis();
-    isNightFading = true;
-  }
+  if (currentScene === 3) {
 
-  if (isNightFading == true && isDayFading == false) {
-    for (let i = 0; i < 3; i++) { 
-      bkgColor[i] += (nightColor[i] - bkgColor[i]) / fadeSpeed;
+      if ((isGirlStopped == true) && (millis() - timer > 3000)) {
+        timer = millis();
+        isNightFading = true;
+      }
+
+
+    if (isNightFading == true && isDayFading == false) {
+      for (let i = 0; i < 3; i++) { 
+        bkgColor[i] += (nightColor[i] - bkgColor[i]) / fadeSpeed;
+      }
+
+      //rsing moon
+      noStroke();
+      fill(194, 200, 209);
+      ellipse(moonX,moonY,100,100);
+      moonX +=5;
+
+      //trying to debug why the sun isn't reaching the end of the width
+      print("MoonX: " + moonX);
+      print("Night Fading: " + isNightFading);
+
+      if (moonX > (width+100)) {
+        isNightFading = false;
+        isDayFading = true;
+        resetMoon();
+        nightToDay += 1; 
+      }
     }
 
-    //rsing moon
-    noStroke();
-    fill(194, 200, 209);
-    ellipse(moonX,moonY,100,100);
-    moonX +=5;
+    //sky brightens 
+    if (isDayFading == true && isNightFading == false) {
+      for (let i = 0; i < 3; i++) { 
+        bkgColor[i] += (dayColor[i] - bkgColor[i]) / fadeSpeed;
+      }
+      
+      //sun rising&setting
+      noStroke();
+      fill(255, 223, 97);
+      ellipse(sunX, sunY, 100, 100);
+      sunX += 5;
+      //sunY += 1;
 
-    //trying to debug why the sun isn't reaching the end of the width
-    print("MoonX: " + moonX);
-    print("Night Fading: " + isNightFading);
+      print("SunX: " + sunX);
+      print("Day Fading: " + isDayFading);
 
-    if (moonX > (width+100)) {
-      isNightFading = false;
-      isDayFading = true;
-      resetMoon();
-      nightToDay += 1; 
-    }
-  }
+      if (sunX > width + 100) {
+      sunX = -100;  // Reset sun after it goes off-screen
+      sunCount += 1;  // Keep track of how many times the sun has crossed
 
-  //sky brightens 
-  if (isDayFading == true && isNightFading == false) {
-    for (let i = 0; i < 3; i++) { 
-      bkgColor[i] += (dayColor[i] - bkgColor[i]) / fadeSpeed;
-    }
-    //background(bkgColor[0], bkgColor[1], bkgColor[2]);
-    //sun rising&setting
-    noStroke();
-    fill(255, 223, 97);
-    ellipse(sunX, sunY, 100, 100);
-    sunX += 5;
-    //sunY += 1;
-
-    print("SunX: " + sunX);
-    print("Day Fading: " + isDayFading);
-
-    // if (sunX == 730) {
-    //   print("SunX stuck at 730. Forcing movement...");
-    //   sunX += 50;  // Force sun to jump forward
-    // }
-
-    // if (sunX >= 700 && sunX <= 800) {
-    //   sunX += 7;  // Speed boost near the edge
-    // } else {
-    //   sunX += 5;  // Normal speed
-    // }
-
-    if(sunX > (width+400)){//changed
-      //rest to night 
-      isDayFading = false;
-      print("SunX after: " + sunX);
-
-      //isNightFading = true;
-      resetSun();
-      resetSky();
-      nightToDay += 1; 
-       if (nightToDay < 2) {
-          isNightFading = true; // Go back to night
-       }
+      if (sunCount >= 2) {
+        // Move to the next scene after two day-night cycles
+        isDayFading = false;
+        currentScene += 1;
+      }
     }
 
-    // if (sunX == 700) {
-    //   print("SunX Stuck at 705, forcing sun movement...");
-    //   sunX += 30;  // Force sun to jump ahead
-    // }
+
+      // if (sunX < (width+100)) {
+      //   sunX += 5;  // Normal speed
+
+      // }
+
+      // if (sunX >= 700 && sunCount == 1) {
+      //   sunCount += 1; 
+      //   resetSun();  
+      //   resetSky();  
+      //   nightToDay += 1;
+      //   isNightFading = true;  
+      //   isDayFading = false;  
+      // } else if (sunX >= 700 && sunCount == 2) {
+      //   // On the second iteration, move to scene4
+      //   isNightFading = false;  
+      //   isDayFading = false; 
+      //   nightToDay += 1; 
+      //   stopScene3();
+      //   currentScene+=1;
+      // }
+    }// sun if statement
+  }//current scene 
 
 
-  }
+  
 
   // Grass
-  fill(20, 128, 18); 
+  stroke(0);
+  fill(5, 173, 61); 
   rect(0, 700, 850, 200);
 
   // Sad circle stays in place
-  stroke(0);
-  fill(0, 0, 255);
+  fill(120, 255, 208);
   ellipse(x, 600, 200, 200);
 
   //rain
@@ -349,10 +407,81 @@ function resetSky() {
   isNightFading = true;    
 }
 
-function scene4() {
-  fill(0);
-  ellipse(400,600, 200, 200);
+function stopScene3() {
+  // moonX = -100;  
+  // sunX = -100;
+  particles = [];  
+  isNightFading = false;  
+  isDayFading = false; 
+  nightToDay = 0;   
+  print("scene 3 end");
+}
 
+function scene4() {
+
+  if (currentScene == 4){
+    //rainStopped = true;
+    timer = millis();
+    bkgColor = [135, 206, 235]; // Example: Sky blue for day
+    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
+    //grass
+    stroke(0);
+    fill(20, 128, 18); 
+    rect(0, 700, 850, 200);
+
+    // Sad circle 
+    fill(120, 255, 208);
+    ellipse(x, 600, 200, 200);
+
+    //sun
+    noStroke();
+    fill(255, 223, 97);
+    ellipse(700, 100, 100, 100);
+    print("hello, I'm scene 4")
+
+    // walk to next scene
+    if (rainStopped == true){
+      x += elWalk;
+
+      if (x >= 900){
+        print("i'm off screen");
+        x = -100;
+        x += elWalk;
+      }
+
+      if (x == 400){
+        x = circleStop;
+        }
+
+    }
+  }
+}
+    //reset postion at the beginning of the screen 
+    
+
+    
+
+
+function flyingBee(x, y) {
+  rectMode(CENTER);
+  strokeWeight(2);
+
+  // Wings
+  fill(201, 248, 255);
+  rect(x - 2, y - 8, 10, 20, 100);
+  rect(x + 2, y - 8, 10, 20, 100);
+
+  // Body
+  fill(250, 215, 57);
+  rect(x, y, 30, 20, 100);
+  fill(0);
+  rect(x, y, 2, 20);
+  rect(x - 8, y, 2, 18);
+  rect(x + 8, y - 2, 3, 3, 20);
+
+  // Stinger
+  rect(x - 18, y, 7, 0)
 }
 
 
