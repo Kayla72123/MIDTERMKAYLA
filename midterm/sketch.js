@@ -22,17 +22,23 @@ let isGirlStopped = false;
 let girlWalksOff = false;
 
 //bkg colors
-let bkgColor = [255, 0, 150]; 
+let bkgColor = [255, 61, 106]; 
 let redColor = [173, 19, 19]; 
 let blueColor = [135, 206, 235]; 
 let nightColor = [29, 54, 92];
 let dayColor = [135, 206, 235];
+let sunsetYellow = [255, 208, 0];
+let sunsetOrange = [255, 153, 0];
+let sunsetPink = [255, 61, 106];
 
 //allows backgrounds to fade into different colors
 let fadeSpeed = 50;
 let isFadingToBlue = false;
 let isNightFading = false;
 let isDayFading = false;
+let yellowFade = false;
+let regSky = true;
+let sunsetCount = 0;
 
 // Rain 
 let particles = [];
@@ -45,6 +51,7 @@ let moonY = 100;
 //sun
 let sunX = -100;
 let sunY = 100;
+let sun = true;
 
 let sunCount = 1;
 let testCount = 1;
@@ -66,11 +73,13 @@ let frequency = 50.5;
 let amplitude = 5;
 
 //flying bee
-let beeX = 0;
+let beeX = -20;
 let beeY = 200; 
 let beeSpeed = 1.2; 
 let waveAmplitude = 20;
 let waveFrequency = 0.05;
+
+let newFlower = 0;
 
 
 
@@ -430,7 +439,7 @@ function scene4() {
   if (currentScene == 4){
     //rainStopped = true;
     timer = millis();
-    bkgColor = [135, 206, 235]; // Example: Sky blue for day
+    bkgColor = [135, 206, 235]; 
     background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
     //grass 
@@ -548,9 +557,17 @@ function flyingBee(x, y) {
 }
 
 function scene5() {
-  if (currentScene == 5){
+  if (currentScene == 5) {
     bkgColor = [135, 206, 235]; 
+    for (let i = 0; i < 3; i++) { 
+      bkgColor[i] += (sunsetYellow[i] - bkgColor[i]) / (fadeSpeed+100);
+    }
+    
+
+
+
     background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
     //grass 
     stroke(0);
     strokeWeight(1);
@@ -562,26 +579,97 @@ function scene5() {
     // Sad circle 
     fill(120, 255, 208);
     if (x < 400) {
-      x += elWalk;  
+      x += elWalk;  // Move circle
     }
     
     // Draw the circle at the current x position
     ellipse(x, 600, 200, 200);
     
     // Sun
-    noStroke();
-    fill(255, 223, 97);
-    ellipse(700, 100, 100, 100);
+    if (sun == true){
+      noStroke();
+      fill(255, 223, 97);
+      ellipse(700, 100, 100, 100);
+    }
 
-    //flower
-    translate(580, 200);
-    noStroke();
-    fill(0);
-    for (let i = 0; i < 10; i ++) {
-      ellipse(0, 30, 20, 80);
-      rotate(PI/5);
+
+    if (x >= 400) {
+      currentScene++;
+    }
+  }
+}
+
+function scene6() {
+  if (currentScene == 6){
+    bkgColor = yellowFade;
+
+    for (let i = 0; i < 3; i++) { 
+        bkgColor[i] += (sunsetOrange[i] - bkgColor[i]) / (fadeSpeed+100); 
+      }
+
+    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+    currentScene++;
+
+
+    //grass 
+    stroke(0);
+    strokeWeight(1);
+    rectMode(CORNER);
+    fill(20, 128, 18);  // Consistent grass color
+    rect(0, 700, 850, 200);
+    
+
+    // Sad circle 
+    fill(120, 255, 208);
+    if (x < 400) {
+      x += elWalk;  // Move circle
     }
     
-    print("hello, I'm scene 5. x: " + x);  
+    // Draw the circle at the current x position
+    ellipse(x, 600, 200, 200);
+    
+    // Sun
+    if (sun == true){
+      noStroke();
+      fill(255, 223, 97);
+      ellipse(700, 100, 100, 100);
+    }
+  }
+}
+
+function scene7() {
+  if (currentScene == 7){
+    bkgColor = sunsetOrange;
+
+    for (let i = 0; i < 3; i++) { 
+        bkgColor[i] += (sunsetPink[i] - bkgColor[i]) / fadeSpeed+(150); 
+      }
+
+    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+
+
+    //grass 
+    stroke(0);
+    strokeWeight(1);
+    rectMode(CORNER);
+    fill(20, 128, 18);  // Consistent grass color
+    rect(0, 700, 850, 200);
+    
+
+    // Sad circle 
+    fill(120, 255, 208);
+    if (x < 400) {
+      x += elWalk;  // Move circle
+    }
+    
+    // Draw the circle at the current x position
+    ellipse(x, 600, 200, 200);
+    
+    // Sun
+    if (sun == true){
+      noStroke();
+      fill(255, 223, 97);
+      ellipse(700, 100, 100, 100);
+    }
   }
 }
