@@ -10,6 +10,7 @@ let circleStop = false;
 let exitScreen = false;
 let movedAcross = 0;
 let stopMoving = false;
+let done = false;
 
 // girl circle
 let girlX = 0;
@@ -448,7 +449,7 @@ function scene4() {
     fill(255, 223, 97);
     ellipse(700, 100, 100, 100);
     print("hello, I'm scene 4");
-
+    //////before changes
 
     //finding the bee
 
@@ -462,63 +463,37 @@ function scene4() {
       print("I'm off screen");  // Debugging 
       x = -100;  // Reset circle 
       exitScreen = true;
+          }
+
+    if (exitScreen == true) {
+      if (beeX > width) {
+        print("Scene 4: Bee has moved off-screen, transitioning to Scene 5");
+        // Reset bee position
+        beeX = -50;  
+        exitScreen = false; // Reset this flag for future scenes
+        circleStop = false;
+        currentScene = 5;  // Transition to scene 5
+      }
     }
 
-    if (exitScreen == true && circleStop == false){
-      x += elWalk;
-      if(x >= 100){
-        circleStop = true;
-        x = 100;
-      }
-
-      if (x >= 900) {
-        exitScreen = true;  
-        circleStop = true; 
-      }
-    }//end of moving across screen 1
-
-
+    // Check if the bee should be moving
     if (circleStop == true) {
       // Move the bee
       beeX += beeSpeed;
       beeY = 200 + waveAmplitude * sin(waveFrequency * beeX);
     }
 
-      if (beeX > width) {
-        beeX = -50;  
-        circleStop = false; 
-        if (x >= 900) {
-          movedAcross += 1;
-          x = -100; 
-          beeX = -50; 
-          exitScreen = false;
-          circleStop = false;
-        }
-      }
-    
-      flyingBee(beeX, beeY);
-
-      if (beeX > 200){
-        rainStopped = true;
-        exitScreen = false;
-      }
+    // Flying bee logic
+    if (beeX > 200) {
+      rainStopped = true;  // Start moving the circle
+      exitScreen = false;  // Ensure this is reset
     }
 
-    if(movedAcross >= 1 && stopMoving == false){
-      x += elWalk;
-    }
-
-    if (x >= 400 && movedAcross >= 1){
-      stopMoving = true;
-      x = 400;
-
-    }
-
-
-
-
-
+    // Drawing the bee
+    flyingBee(beeX, beeY);
   }
+}
+
 
 
 function flyingBee(x, y) {
@@ -540,6 +515,44 @@ function flyingBee(x, y) {
 
   // Stinger
   rect(x - 18, y, 7, 0)
+}
+
+function scene5() {
+  if (currentScene == 5){
+    bkgColor = [135, 206, 235]; // Example: Sky blue for day
+    background(bkgColor[0], bkgColor[1], bkgColor[2]);
+    x = 0;
+    //grass 
+    stroke(0);
+    strokeWeight(1);
+    rectMode(CORNER);
+    fill(20, 128, 18);  // Consistent grass color
+    rect(0, 700, 850, 200);
+    
+
+    // Sad circle 
+    fill(120, 255, 208);
+    ellipse(x, 600, 200, 200);
+
+    //sun
+    noStroke();
+    fill(255, 223, 97);
+    ellipse(700, 100, 100, 100);
+    print("hello, I'm scene 4");
+
+    if (done == false){
+      x += elWalk;
+
+      if (x == 400){
+        done = true;
+        x = 400;
+      }
+    }
+
+
+
+  }
+
 }
 
 
