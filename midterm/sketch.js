@@ -1,6 +1,7 @@
 //scene tracker
 let currentScene = 1;
 let timer = 0;
+let nightToDay;
 
 // sad circle 
 let x = 400;
@@ -8,7 +9,7 @@ let elWalk = 2;
 let circleStop = 400;
 
 // girl circle
-let girlX = -100;
+let girlX = 0;
 let girlSpeed = 2;
 
 // girl's movement
@@ -35,7 +36,6 @@ let rainStopped = false;
 //moon
 let moonX = -100;
 let moonY = 100;
-let nightToDay = 0;
 
 //sun
 let sunX = -100;
@@ -44,7 +44,6 @@ let sunY = 100;
 let sunCount = 1;
 let testCount = 1;
 
-//messing with breakup scene 
 let rectX = 0;
 let rectY = 900;
 
@@ -144,12 +143,11 @@ function resetScene() {
   //color reset
   stroke(0);
    
-  isFadingToBlue = false;  // Corrected global variables
-  isNightFading = false;
-  isDayFading = false;
+  let isFadingToBlue = false;
+  let isNightFading = false;
   currentScene = 1;
 
-  //moon & sun
+  //moon&sun
   moonX = -100;
   sunX = -100;
 
@@ -305,46 +303,34 @@ function scene3() {
       noStroke();
       fill(255, 223, 97);
       ellipse(sunX, sunY, 100, 100);
-      sunX += 5;
+      //sunX += 5;
       //sunY += 1;
 
       print("SunX: " + sunX);
       print("Day Fading: " + isDayFading);
 
-      if (sunX > width + 100) {
-      sunX = -100;  // Reset sun after it goes off-screen
-      sunCount += 1;  // Keep track of how many times the sun has crossed
 
-      if (sunCount >= 2) {
-        // Move to the next scene after two day-night cycles
-        isDayFading = false;
-        currentScene += 1;
+      if (sunX < (width+100)) {
+        sunX += 5;  // Normal speed
+
+      }
+
+      if (sunX >= 700 && sunCount == 1) {
+        sunCount += 1; 
+        resetSun();  
+        resetSky();  
+        nightToDay += 1;
+        isNightFading = true;  
+        isDayFading = false;  
+      } else if (sunX >= 700 && sunCount == 2) {
+        // On the second iteration, move to scene4
+        isNightFading = false;  
+        isDayFading = false; 
+        stopScene3()
+        currentScene+=1;
       }
     }
-
-
-      // if (sunX < (width+100)) {
-      //   sunX += 5;  // Normal speed
-
-      // }
-
-      // if (sunX >= 700 && sunCount == 1) {
-      //   sunCount += 1; 
-      //   resetSun();  
-      //   resetSky();  
-      //   nightToDay += 1;
-      //   isNightFading = true;  
-      //   isDayFading = false;  
-      // } else if (sunX >= 700 && sunCount == 2) {
-      //   // On the second iteration, move to scene4
-      //   isNightFading = false;  
-      //   isDayFading = false; 
-      //   nightToDay += 1; 
-      //   stopScene3();
-      //   currentScene+=1;
-      // }
-    }// sun if statement
-  }//current scene 
+  }
 
 
   
@@ -414,6 +400,7 @@ function stopScene3() {
   isNightFading = false;  
   isDayFading = false; 
   nightToDay = 0;   
+  rainStopped = true;
   print("scene 3 end");
 }
 
@@ -438,7 +425,7 @@ function scene4() {
     noStroke();
     fill(255, 223, 97);
     ellipse(700, 100, 100, 100);
-    print("hello, I'm scene 4")
+    print("hello, I'm scene 4");
 
     // walk to next scene
     if (rainStopped == true){
@@ -457,11 +444,6 @@ function scene4() {
     }
   }
 }
-    //reset postion at the beginning of the screen 
-    
-
-    
-
 
 function flyingBee(x, y) {
   rectMode(CENTER);
@@ -483,6 +465,14 @@ function flyingBee(x, y) {
   // Stinger
   rect(x - 18, y, 7, 0)
 }
+
+
+
+
+
+
+
+
 
 
 
