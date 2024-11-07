@@ -5,8 +5,11 @@ let nightToDay;
 
 // sad circle 
 let x = 400;
-let elWalk = 2;
-let circleStop = 400;
+let elWalk = 1;
+let circleStop = false;
+let exitScreen = false;
+let movedAcross = 0;
+let stopMoving = false;
 
 // girl circle
 let girlX = 0;
@@ -44,10 +47,12 @@ let sunY = 100;
 let sunCount = 1;
 let testCount = 1;
 
+//grass
 let rectX = 0;
 let rectY = 900;
-
 let xOffset=400;
+let shake = true;
+
 
 
 //p5 frequency reference
@@ -57,6 +62,13 @@ let endX = 300;
 let endY = 700; 
 let frequency = 50.5;
 let amplitude = 5;
+
+//flying bee
+let beeX = 0;
+let beeY = 200; 
+let beeSpeed = 1.2; 
+let waveAmplitude = 20;
+let waveFrequency = 0.05;
 
 
 
@@ -71,6 +83,10 @@ function setup() {
 
   // Time triggers certain events 
   timer = millis();
+
+  //grass 
+  fill(20, 128, 18);  // Consistent grass color
+  rect(0, 700, 850, 200);
 
   //start to rain in scene 3 
   for (let i = 0; i < 100; i++) {
@@ -171,8 +187,8 @@ function scene1() {
   rectMode(CORNER); 
 
   // Grass
-  fill(5, 173, 61); 
-  rect(0, 700, 850, 200);
+  fill(5, 173, 61);
+  rect(0, height - 100, width, 100);
 
   // Static sad circle
   fill(120, 255, 208);
@@ -210,12 +226,14 @@ function scene1() {
     ellipse(xOffset, 600, 200, 200);
 
     //ground shaking
-    rectX = random(-10,50);
-    rectY = random(700,750);
-    fill(34, 87, 43); 
-    rect(rectX, rectY, 850, 200);
-    fill(5, 173, 61);
-    rect(rectX=5, rectY+10, 850, 200);
+    if (shake == true){
+      rectX = random(-10, 50);
+      rectY = random(700, 750);
+      fill(34, 87, 43);
+      rect(rectX, rectY, width, 100); 
+      fill(5, 173, 61);
+      rect(0, rectY + 10, width, 100);
+    }
 
     //girl leaving
     girlX -= girlSpeed;
@@ -224,6 +242,7 @@ function scene1() {
 
   //moves to scene 2 when the girl circle is off the screen
   if (girlX <= -200 && (millis() - timer > 10000)){
+    shake = false;
     isFadingToBlue = true;
     currentScene+=1;
     timer = millis();
@@ -412,10 +431,13 @@ function scene4() {
     bkgColor = [135, 206, 235]; // Example: Sky blue for day
     background(bkgColor[0], bkgColor[1], bkgColor[2]);
 
-    //grass
+    //grass 
     stroke(0);
-    fill(20, 128, 18); 
+    strokeWeight(1);
+    rectMode(CORNER);
+    fill(20, 128, 18);  // Consistent grass color
     rect(0, 700, 850, 200);
+    
 
     // Sad circle 
     fill(120, 255, 208);
@@ -427,23 +449,77 @@ function scene4() {
     ellipse(700, 100, 100, 100);
     print("hello, I'm scene 4");
 
-    // walk to next scene
-    if (rainStopped == true){
-      x += elWalk;
 
-      if (x >= 900){
-        print("i'm off screen");
-        x = -100;
-        x += elWalk;
+    //finding the bee
+
+    if (rainStopped == true && exitScreen == false) {
+      x += elWalk;
+      print("Circle x position: " + x);  // Debugging x position
+    }
+
+    // Check if the circle has moved off the screen
+    if (x >= 900 && (exitScreen == false)) {
+      print("I'm off screen");  // Debugging 
+      x = -100;  // Reset circle 
+      exitScreen = true;
+    }
+
+    if (exitScreen == true && circleStop == false){
+      x += elWalk;
+      if(x >= 100){
+        circleStop = true;
+        x = 100;
       }
 
-      if (x == 400){
-        x = circleStop;
+      if (x >= 900) {
+        exitScreen = true;  
+        circleStop = true; 
+      }
+    }//end of moving across screen 1
+
+
+    if (circleStop == true) {
+      // Move the bee
+      beeX += beeSpeed;
+      beeY = 200 + waveAmplitude * sin(waveFrequency * beeX);
+    }
+
+      if (beeX > width) {
+        beeX = -50;  
+        circleStop = false; 
+        if (x >= 900) {
+          movedAcross += 1;
+          x = -100; 
+          beeX = -50; 
+          exitScreen = false;
+          circleStop = false;
         }
+      }
+    
+      flyingBee(beeX, beeY);
+
+      if (beeX > 200){
+        rainStopped = true;
+        exitScreen = false;
+      }
+    }
+
+    if(movedAcross >= 1 && stopMoving == false){
+      x += elWalk;
+    }
+
+    if (x >= 400 && movedAcross >= 1){
+      stopMoving = true;
+      x = 400;
 
     }
+
+
+
+
+
   }
-}
+
 
 function flyingBee(x, y) {
   rectMode(CENTER);
